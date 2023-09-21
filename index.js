@@ -1,30 +1,27 @@
 const express = require('express');
-require('./config');
-const product = require('./product');
+const EventEmitter = require('events');
 const app = express();
+const event = new EventEmitter();
 
-
-app.use(express.json());
-
-
-
-
-
-app.get('/search/:key',async(req,res)=>{
-    let data = await product.find(
-        {
-            "$or":[
-                {name : {$regex:req.params.key}}
-            ]
-        }
-    );
-    
-    console.log(data);
-    res.send(data);
+let count =0 ;
+event.on('countAPI',()=>{
+  
+  count++;
+  console.log("called API",count)
+})
+app.get('/',(req,res) => {
+  res.send("home");
+  event.emit("countAPI");
 })
 
+app.get('/search',(req,res) => {
+  res.send("search");
+  event.emit("countAPI");
+})
 
-
-
+app.get('/update',(req,res) => {
+  res.send("update");
+  event.emit("countAPI");
+})
 
 app.listen(5000);
